@@ -22,6 +22,11 @@ CREATE TABLE roles (
     nombre VARCHAR(50) NOT NULL UNIQUE
     );
     
+INSERT INTO roles (nombre) VALUES ('Admin');    -- Se creará con ID 1
+INSERT INTO roles (nombre) VALUES ('Usuario');  -- Se creará con ID 2
+
+SELECT * FROM roles;
+    
 CREATE TABLE usuarios (
 	id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(15) NOT NULL UNIQUE,

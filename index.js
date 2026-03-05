@@ -107,7 +107,25 @@ app.post('/api/categorias', (req, res) =>{
     });
 });
 
+app.put('/api/categorias/:id', (req, res) => {
+    const { id } = req.params;
+    const { nombre } = req.body;
+    const sqlCheck = "SELECT * FROM categorias WHERE id = ?";
+    const sqlUpdate = "UPDATE categorias SET nombre = ? WHERE id = ?";
+    db.query(sqlUpdate, [nombre, id], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ mensaje: "Categoría no encontrada" });
+        } else {
+            db.query(sqlCheck, [id], (err, results) => {
+                if (err) return res.status(500).json({ error: err.message });
+                res.json({ mensaje: "Categoría actualizada con éxito", categoria: results[0] });
+            });
+        }
+    });
+});
 
+// ------------------------------------- CREACIÓN Y MODIFICACIÓN DE PRODUCTOS ------------------------------------
 
 //Crea la ruta de tipo GET para solicitar la lista de productos a la base de datos
 app.get('/api/productos', (req, res)=>{
@@ -116,6 +134,76 @@ app.get('/api/productos', (req, res)=>{
     db.query(sql, (err, results)=>{
         if (err) return res.status(500).json({ error: err.message});
         res.json(results);
+    });
+});
+
+//Crea la ruta de tipo GET para solicitar un producto específico a la base de datos
+app.get('/api/productos/:nombre', (req, res) => {
+    const { nombre } = req.params;
+    const sql = "SELECT * FROM productos WHERE nombre = ?";
+    db.query(sql, [nombre], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (results.length === 0) {
+            return res.status(404).json({ mensaje: "Producto no encontrado" });
+        } else {
+            res.json(results[0]);
+        }
+    });
+})
+
+//Crea la ruta de tipo POST para agregar un nuevo producto a la base de datos
+app.post('/api/productos', (req, res) => {
+    const { nombre, descripcion, precio, stock, imagen_url, categoria_id } = req.body;
+    // Validación básica
+    if (!categoria_id) {
+        return res.status(400).json({ mensaje: "La categoría es obligatoria" });
+    }
+    // Generamos el código único (usando tiempo + aleatorio para evitar colisiones)
+    const codigo_unico = `PROD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const sqlInsert = "INSERT INTO productos (codigo_unico, nombre, descripcion, precio, stock, imagen_url, categoria_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    const valores = [codigo_unico, nombre, descripcion, precio, stock, imagen_url, categoria_id];
+    db.query(sqlInsert, valores, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ 
+            mensaje: "Producto creado con éxito", 
+            id: result.insertId,
+            codigo: codigo_unico 
+        });
+    });
+});
+
+//Crea la ruta de tipo PUT para actualizar un producto existente en la base de datos
+app.put('/api/productos/:id', (req, res) => {
+    const { id } = req.params;
+    const { nombre, descripcion, precio, stock, imagen_url, categoria_id } = req.body;
+    
+    const sqlUpdate = "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, imagen_url = ?, categoria_id = ? WHERE id = ?";
+    const sqlGet = "SELECT * FROM productos WHERE id = ?";
+
+    // 1. Ejecutamos la actualización
+    db.query(sqlUpdate, [nombre, descripcion, precio, stock, imagen_url, categoria_id, id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        
+        // Verificamos si se actualizó algo (affectedRows)
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ mensaje: "Producto no encontrado" });
+        }
+
+        // 2. Si se actualizó, buscamos el producto para devolverlo
+        db.query(sqlGet, [id], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ mensaje: "Producto actualizado con éxito", producto: results[0] });
+        });
+    });
+});
+
+app.delete('/api/productos/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = "DELETE FROM productos WHERE id = ?";
+    db.query(sql, [id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (result.affectedRows === 0) return res.status(404).json({ mensaje: "Producto no encontrado" });
+        res.json({ mensaje: "Producto eliminado con éxito" });
     });
 });
 
