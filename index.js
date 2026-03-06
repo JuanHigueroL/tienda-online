@@ -151,6 +151,15 @@ app.get('/api/productos/:nombre', (req, res) => {
     });
 })
 
+app.get('/api/productos/categoria/:categoria_id', (req, res) => {
+    const {categoria_id} = req.params;
+    const sql = "SELECT * FROM productos WHERE categoria_id = ?";
+    db.query(sql, [categoria_id], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(results);
+    });
+})
+
 //Crea la ruta de tipo POST para agregar un nuevo producto a la base de datos
 app.post('/api/productos', (req, res) => {
     const { nombre, descripcion, precio, stock, imagen_url, categoria_id } = req.body;
