@@ -39,7 +39,7 @@ $(document).ready(function() {
                 $('#contenedor-productos').append(tarjeta);
             });
         }).fail(function() {
-            // Si el servidor está apagado o hay un error, avisamos
+            // Si el servidor está apagado o hay un error, se muestra un mensaje de error
             $('#contenedor-productos').html('<div class="alert alert-danger">Error al conectar con el servidor. Disculpe las molestias</div>');
         });
     }
