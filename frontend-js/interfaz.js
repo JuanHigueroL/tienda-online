@@ -6,6 +6,7 @@ $(document).ready(function() {
     // Si existe un tema guardado, lo aplicamos de inmediato
     if (temaGuardado) {
         $('html').attr('data-bs-theme', temaGuardado);
+        $('#btn-modo-oscuro').html(temaGuardado === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>');
     }
 
     $('#btn-modo-oscuro').click(function(e) {

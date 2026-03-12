@@ -17,13 +17,27 @@ $(document).ready(function() {
                 $('#contenedor-productos').append('<p class="text-center">No hay productos disponibles.</p>');
                 return;
             }
+            $.get(`${API_URL}/categorias`, function(categorias) {
+                categorias.forEach(c => {
+                    const categoria = `
+                        <div class="container-fluid mt-4">
+                            <h3 class="fw-bold" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#collapse-${c.id}">
+                                ${c.nombre}
+                            </h3>
 
-            // Se recorre el array de productos y se crea una tarjeta para cada uno
-            productos.forEach(p => {
+                            <div class="collapse show" id="collapse-${c.id}">
+                                <div class="row g-3" id="lista-${c.id}">
+                                </div>
+                            </div>
+                        </div>`;
+                    $('#contenedor-productos').append(categoria);
+                });
+                // Se recorre el array de productos y se crea una tarjeta para cada uno
+                productos.forEach(p => {
                 const imagenMostrada = p.imagen_url ? p.imagen_url : '../uploads/placeholder.png';
                 const tarjeta = `
                     <div class="col-6 col-md-4 col-lg-3">
-                        <div class="card h-100 shadow-sm border-0">
+                        <div class="card h-100 shadow-sm border-0" value=${p.categoria_id}>
                             <img src="${imagenMostrada}" class="card-img-top" alt="${p.nombre}">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title h6">${p.nombre}</h5>
@@ -36,8 +50,12 @@ $(document).ready(function() {
                     </div>
                 `;
                 // Agrega la tarjeta al contenedor de productos
-                $('#contenedor-productos').append(tarjeta);
+                $('#lista-' + p.categoria_id).append(tarjeta);
             });
+            }).fail(function() {
+                console.log("Error al cargar categorías");
+            });
+            
         }).fail(function() {
             // Si el servidor está apagado o hay un error, se muestra un mensaje de error
             $('#contenedor-productos').html('<div class="alert alert-danger">Error al conectar con el servidor. Disculpe las molestias</div>');
