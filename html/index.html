@@ -5,33 +5,7 @@
     <title>Mi tienda</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <style>
-    /* 1. El contenedor de la imagen (El "marco") */
-    .contenedor-zoom {
-        width: 100%;
-        height: 200px; /* Altura fija para todas las miniaturas */
-        overflow: hidden; /* IMPORTANTE: Recorta la imagen si sobresale */
-        position: relative; /* Para posicionamiento interno si fuera necesario */
-        background-color: #f8f9fa; /* Fondo gris suave por si la imagen es pequeña */
-    }
-
-    /* 2. La imagen dentro del contenedor (La miniatura) */
-    .contenedor-zoom img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; /* Ajusta la imagen sin estirarla, manteniendo proporciones */
-        padding: 10px; /* Espaciado interno para que no toque los bordes */
-        
-        /* Prepara la transición suave para 'transform' */
-        transition: transform 0.4s ease-in-out; 
-    }
-
-    /* 3. Efecto al pasar el ratón (Hover) sobre la TARJETA */
-    .card:hover .contenedor-zoom img {
-        /* Agranda la imagen un 30% (1.3) */
-        transform: scale(1.3); 
-    }
-</style>
+    <link rel="stylesheet" href="../css/imagen-ampliada.css">
 </head>
 <body>
     <nav class="navbar navbar-light border-bottom">

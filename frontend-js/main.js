@@ -38,7 +38,7 @@ $(document).ready(function() {
                 const tarjeta = `
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="card h-100 shadow-sm border-0" value=${p.categoria_id}>
-                            <img src="${imagenMostrada}" class="card-img-top" alt="${p.nombre}">
+                            <img src="${imagenMostrada}" class="imagen-card card-img-top" alt="${p.nombre}">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title h6">${p.nombre}</h5>
                                 <p class="card-text fw-bold text-primary">${p.precio} €</p>
@@ -65,6 +65,36 @@ $(document).ready(function() {
     // Ejecutar al cargar la página
     cargarProductos();
 
+    // Añadimos el "Visor" al final del HTML de la página
+    $('body').append(`
+        <div id="visor-centro">
+            <img src="" id="img-visor" alt="Vista ampliada">
+        </div>
+    `);
+
+    // Variable para guardar el reloj cuenta atrás
+    let temporizadorHover;
+
+    // Cuando el ratón ENTRA en la imagen de la tarjeta
+    $(document).on('mouseenter', '.imagen-card', function() {
+        const rutaImagen = $(this).attr('src'); // Copiamos la ruta de la imagen actual
+        
+        // Iniciamos el reloj (1000 milisegundos = 1 segundo) 
+        temporizadorHover = setTimeout(function() {
+            // Pasado 1 segundo, ponemos la imagen en el centro y lo mostramos
+            $('#img-visor').attr('src', rutaImagen);
+            $('#visor-centro').addClass('activo');
+        }, 1000); 
+    });
+
+    // Cuando el ratón SALE de la imagen de la tarjeta
+    $(document).on('mouseleave', '.imagen-card', function() {
+        // Cancelamos el reloj por si el usuario sacó el ratón antes del segundo
+        clearTimeout(temporizadorHover); 
+        
+        // Ocultamos el visor central instantáneamente
+        $('#visor-centro').removeClass('activo');
+    });
 
     // Función para mostrar las categorías
     function cargarCategorias() {

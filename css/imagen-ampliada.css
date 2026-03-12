@@ -1,0 +1,46 @@
+
+    /* La imagen normal en la tarjeta */
+    .imagen-card {
+        cursor: crosshair; /* Un cursor distinto para que el usuario sepa que puede ampliar */
+    }
+
+    /* El fondo oscuro y centrado (Oculto por defecto) */
+    #visor-centro {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background-color: rgba(0, 0, 0, 0.85); /* Fondo muy oscuro */
+        z-index: 9999; /* Por encima de la barra de navegación y todo lo demás */
+        
+        /* Flexbox para centrar lo que haya dentro */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        opacity: 0; /* Invisible al inicio */
+        transition: opacity 0.3s ease-in-out;
+        
+        /* Evita que el fondo interfiera con el ratón */
+        pointer-events: none; /* Solo se activará cuando tenga la clase .activo */
+    }
+
+    /* Cuando el JS le añada la clase .activo, se mostrará */
+    #visor-centro.activo {
+        opacity: 1;
+    }
+
+    /* Diseño de la imagen clonada en el centro */
+    #visor-centro img {
+        max-width: 90vw; /* Máximo 90% del ancho de la pantalla */
+        max-height: 90vh; /* Máximo 90% del alto de la pantalla */
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        
+        /* Efecto de que la imagen viene de lejos y se acerca */
+        transform: scale(0.7);
+        transition: transform 0.3s ease-out;
+    }
+
+    #visor-centro.activo img {
+        transform: scale(1); /* Alcanza su tamaño máximo */
+    }
