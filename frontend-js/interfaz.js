@@ -17,7 +17,7 @@ $(document).ready(function() {
 
         // Si esOscuro es true, el nuevo tema será 'light', si no, será 'dark'
         const nuevoTema = esOscuro ? 'light' : 'dark';
-        const textoBoton = esOscuro ? '<i class="bi bi-moon me-2"></i>Modo Oscuro' : '<i class="bi bi-sun me-2"></i>Modo Claro';
+        const textoBoton = esOscuro ? '<i class="bi bi-moon"></i>' : '<i class="bi bi-sun"></i>';
         
         // Aplicamos el cambio visual
         $('html').attr('data-bs-theme', nuevoTema);

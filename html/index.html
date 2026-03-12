@@ -18,17 +18,11 @@
                 <a class="navbar-brand m-0 fw-bold text-uppercase" href="#">Mi tienda</a>
             </div>
             <div class="nav-right d-flex gap-2">
+
                 <div class="dropdown">
-                    <button class="btn position-relative" data-bs-toggle="dropdown" data-bs-display="static">
-                        <i class="bi bi-cart"></i>
-                        <span id="contador-carrito" class="badge bg-danger rounded-pill position-absolute translate-middle" style="font-size: 0.75rem; padding: 0.25em 0.5em; top:22%; left: 80%">0</span>
+                    <button class="btn" id="btn-modo-oscuro">
+                        <i class="bi bi-moon"></i>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-end p-3 shadow border-0" style="min-width: 250px;">
-                        <h6 class="fw-bold">Tu Carrito</h6>
-                        <hr>
-                        <p class="small text-center text-muted">El carrito está vacío</p>
-                        <button class="btn btn-primary btn-sm w-100">Ver todo</button>
-                    </div>
                 </div>
 
                 <div class="dropdown">
@@ -41,24 +35,10 @@
                     </ul>
                 </div>
 
-                <div class="dropdown">
-                    <button class="btn " data-bs-toggle="dropdown">
-                        <i class="bi bi-gear"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li>
-                            <a class="dropdown-item" href="#" id="btn-modo-oscuro">
-                                <i class="bi bi-moon me-2"></i>Modo Oscuro
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="bi bi-translate me-2">
-                                </i>Idioma
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                <button class="btn position-relative" data-bs-toggle="offcanvas" data-bs-target="#menuCesta">
+                    <i class="bi bi-cart"></i>
+                <span id="contador-carrito" class="badge bg-danger rounded-pill position-absolute translate-middle" style="font-size: 0.75rem; padding: 0.25em 0.5em; top:22%; left: 80%">0</span>
+                </button>
             </div>
         </div>
     </nav>
@@ -90,15 +70,30 @@
 </main>
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="menuBuscador" aria-labelledby="labelBuscador">
-  <div class="offcanvas-header border-bottom">
-    <h5 class="offcanvas-title fw-bold" id="labelBuscador">BUSCAR PRODUCTOS</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body">
-    <div class="input-group mb-3">
-      <input type="text" id="input-lateral" class="form-control" placeholder="Filtro de categorías">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold" id="labelBuscador">FILTRAR POR CATEGORIAS</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-  </div>
+    <div class="offcanvas-body">
+        <div class="input-group mb-3">
+            <input type="text" id="input-lateral" class="form-control" placeholder="Filtro de categorías">
+        </div>
+        <div class="seccion-filtros mb-4">
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="filtroEjemplo" id="filtroEjemplo" value="Ejemplo">
+                <label class="form-check-label small" for="filtroEjemplo">Espera a que carguen las categorías</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-end" tabindex="-1" id="menuCesta" aria-labelledby="labelCesta">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title fw-bold" id="labelCesta">CESTA DE LA COMPRA</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

@@ -46,4 +46,45 @@ $(document).ready(function() {
 
     // Ejecutar al cargar la página
     cargarProductos();
+
+
+    // Función para mostrar las categorías
+    function cargarCategorias() {
+        console.log("Conectando con la base de datos...");
+        $.get(`${API_URL}/categorias`, function(categorias) {
+            console.log("Datos recibidos:", categorias);
+
+            $('.seccion-filtros').empty();
+
+            const opcionTodas = `
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="categoria" id="cat-todas" value="0" checked>
+                <label class="form-check-label small" for="cat-todas">Todas las categorías</label>
+            </div>
+            <hr class="opacity-25">`;
+
+            $('.seccion-filtros').append(opcionTodas);
+
+            if(categorias.length ===0) {
+                $('.seccion-filtros').append('<p class="text-center">No hay categorías disponibles.</p>');
+                return;
+            } else {
+                categorias.forEach(c => {
+                    const filtro =  `<div class="form-check mb-2">
+                                        <input class="form-check-input" type="radio" name="categoria" id="cat-${c.nombre}" value="${c.id}">
+                                        <label class="form-check-label small" for="cat-${c.nombre}">${c.nombre}</label>
+                                    </div>`
+                    $('.seccion-filtros').append(filtro);
+                });
+            }
+            
+        }).fail(function() {
+            $('.seccion-filtros').html('<div class="alert alert-danger">Error al conectar con el servidor. Disculpe las molestias</div>');
+        });
+
+    }
+
+    // Ejecutamos la función al cargar
+    cargarCategorias();
+
 });
