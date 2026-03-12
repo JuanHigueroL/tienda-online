@@ -36,8 +36,8 @@ $(document).ready(function() {
                 productos.forEach(p => {
                 const imagenMostrada = p.imagen_url ? p.imagen_url : '../uploads/placeholder.png';
                 const tarjeta = `
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <div class="card h-100 shadow-sm border-0" value=${p.categoria_id}>
+                    <div class="col-6 col-md-4 col-lg-3 tarjeta-producto" data-nombre="${p.nombre.toLowerCase()}">
+                        <div class="card h-100 shadow-sm border-0">
                             <img src="${imagenMostrada}" class="imagen-card card-img-top" alt="${p.nombre}">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title h6">${p.nombre}</h5>
@@ -95,6 +95,28 @@ $(document).ready(function() {
         // Ocultamos el visor central instantáneamente
         $('#visor-centro').removeClass('activo');
     });
+
+    // Función encargada de filtrar los productos
+    function filtrarBuscador() {
+        // Obtener el texto escrito y pasarlo a minúsculas
+        const textoBuscado = $('#input-busqueda').val().toLowerCase();
+
+        // Recorrer cada tarjeta de la pantalla
+        $('.tarjeta-producto').each(function() {
+            // Leer el nombre del producto que guardamos en el HTML
+            const nombreProducto = $(this).attr('data-nombre');
+
+            // Comprobar si el nombre contiene el texto buscado
+            if (nombreProducto.includes(textoBuscado)) {
+                $(this).fadeIn(300); // Muestra la tarjeta si coincide
+            } else {
+                $(this).fadeOut(300); // Oculta la tarjeta si no coincide
+            }
+        });
+    }
+
+// Ejecutar el filtro en tiempo real mientras se escribe
+$('#input-busqueda').on('keyup', filtrarBuscador);
 
     // Función para mostrar las categorías
     function cargarCategorias() {
