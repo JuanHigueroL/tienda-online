@@ -40,7 +40,7 @@
 
                 <button class="btn position-relative" data-bs-toggle="offcanvas" data-bs-target="#menuCesta">
                     <i class="bi bi-cart"></i>
-                <span id="contador-carrito" class="badge bg-danger rounded-pill position-absolute translate-middle" style="font-size: 0.75rem; padding: 0.25em 0.5em; top:22%; left: 80%">0</span>
+                <span id="contador-carrito" class="badge bg-danger rounded-pill position-absolute translate-middle" style="display:none; font-size: 0.75rem; padding: 0.25em 0.5em; top:22%; left: 80%">0</span>
                 </button>
             </div>
         </div>
@@ -92,7 +92,8 @@
         <h5 class="offcanvas-title fw-bold" id="labelCesta">CESTA DE LA COMPRA</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body">
+    <div class="offcanvas-body" id="contenedor-cesta">
+        <p class="text-muted">Tu cesta está vacía. ¡Agrega productos para verlos aquí!</p>
     </div>
 </div>
 

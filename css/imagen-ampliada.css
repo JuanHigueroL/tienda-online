@@ -7,7 +7,7 @@
     /* El fondo oscuro y centrado (Oculto por defecto) */
     #visor-centro {
         position: fixed;
-        top: 0; left: 0;
+        top: 0; left: 0; 
         width: 100vw; height: 100vh;
         background-color: rgba(0, 0, 0, 0.85); /* Fondo muy oscuro */
         z-index: 9999; /* Por encima de la barra de navegación y todo lo demás */

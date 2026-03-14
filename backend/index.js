@@ -1,3 +1,5 @@
+// node C:\Users\Usuario\Desktop\Master\Frameworks-Frontend\practica-intermedia\tienda-online\backend\index.js
+
 // Importa el framework Express
 const express = require('express');
 // Importa el conector a MySQL
@@ -134,6 +136,21 @@ app.get('/api/productos', (req, res)=>{
     db.query(sql, (err, results)=>{
         if (err) return res.status(500).json({ error: err.message});
         res.json(results);
+    });
+});
+
+// Crea la ruta de tipo GET para solicitar un producto específico por su ID
+app.get('/api/productos/:id', (req, res) => {
+    const { id } = req.params;
+    // Se actualiza la consulta para buscar por la columna 'id'
+    const sql = "SELECT * FROM productos WHERE id = ?";
+    db.query(sql, [id], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (results.length === 0) {
+            return res.status(404).json({ mensaje: "Producto no encontrado" });
+        } else {
+            res.json(results[0]);
+        }
     });
 });
 

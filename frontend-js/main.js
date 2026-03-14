@@ -42,9 +42,23 @@ $(document).ready(function() {
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title h6">${p.nombre}</h5>
                                 <p class="card-text fw-bold text-primary">${p.precio} €</p>
-                                <button class="btn btn-outline-primary btn-sm mt-auto w-100 btn-agregar" data-id="${p.id}">
-                                    <i class="bi bi-cart-plus me-2"></i>Añadir
-                                </button>
+                                <p id="stock-${p.id}" class="card-text fw-bold text-primary">${p.stock} unidades</p>
+                                
+                                <div class="btn-group btn-group-sm mt-auto w-100" role="group" aria-label="Controles de carrito">
+    
+                                    <button type="button" class="btn btn-outline-primary px-1 btn-quitar" onclick="quitarProducto(${p.id})" title="Quitar unidad">
+                                        <i class="bi bi-dash-lg"></i>
+                                    </button>
+    
+                                    <span class="btn btn-outline-primary flex-grow-1 disabled" style="opacity: 1; pointer-events: none; border-left: none; border-right: none;">
+                                        <i class="bi bi-cart me-2"></i>Añadir
+                                    </span>
+    
+                                    <button type="button" class="btn btn-outline-primary px-1 btn-sumar" onclick="añadirProducto(${p.id})" title="Añadir unidad">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -64,6 +78,21 @@ $(document).ready(function() {
 
     // Ejecutar al cargar la página
     cargarProductos();
+
+
+    //Función para la cesta y el stock de productos
+
+    let productosEnCesta = {};
+    const elementoContador = document.getElementById('contador-carrito');
+    let totalCesta = parseInt(elementoContador.textContent);
+
+    function añadirProducto(id) {
+        
+    }
+
+    function quitarProducto(id) {
+        
+    }
 
     // Añadimos el "Visor" al final del HTML de la página
     $('body').append(`
@@ -156,5 +185,4 @@ $('#input-busqueda').on('keyup', filtrarBuscador);
 
     // Ejecutamos la función al cargar
     cargarCategorias();
-
 });
