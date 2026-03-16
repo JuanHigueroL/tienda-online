@@ -121,18 +121,34 @@ function printCesta(productos) {
             
             totalAcumulado += subtotal;
             
+            // Validación para la imagen (por si algún producto no tiene URL)
+            const imagenMostrada = p.imagen_url ? p.imagen_url : '../uploads/placeholder.png';
+            
             const itemCesta = `
-                <div class="cesta-item p-3 d-flex justify-content-between align-items-center border-bottom">
-                    <div>
-                        <h6 class="mb-0 fw-bold">${p.nombre}</h6>
-                        <small class="text-muted">Precio unitario: ${p.precio}</small>
+                <div class="cesta-item p-3 d-flex align-items-center border-bottom">
+                    
+                    <div class="me-3" style="width: 60px; height: 60px; flex-shrink: 0;">
+                        <img src="${imagenMostrada}" class="img-fluid rounded object-fit-cover w-100 h-100 shadow-sm" alt="${p.nombre}">
                     </div>
-                    <div>
-                        <span class="badge bg-secondary rounded-pill">${cantidadEnCesta} un.</span>
+
+                    <div class="flex-grow-1 overflow-hidden">
+                        <h6 class="mb-1 fw-bold text-truncate">${p.nombre}</h6>
+                        <div class="text-muted" style="font-size: 0.75rem;">
+                            <span class="fw-bold">Cód:</span> ${p.codigo_unico}
+                        </div>
+                        <div class="text-muted text-truncate mb-1" style="font-size: 0.75rem;" title="${p.descripcion}">
+                            ${p.descripcion}
+                        </div>
+                        <small class="text-muted">Precio un.: ${p.precio} €</small>
                     </div>
-                    <div class="text-primary fw-bold text-end">
-                        ${subtotal.toFixed(2)}
+
+                    <div class="text-end ms-2 d-flex flex-column align-items-end" style="min-width: 70px;">
+                        <span class="badge bg-secondary rounded-pill mb-2">${cantidadEnCesta} un.</span>
+                        <div class="text-primary fw-bold">
+                            ${subtotal.toFixed(2)} €
+                        </div>
                     </div>
+                    
                 </div>
             `;
             $('#contenedor-cesta').append(itemCesta);
@@ -152,7 +168,6 @@ function printCesta(productos) {
             peticionesCompletadas++;
             if (peticionesCompletadas === productos.length) {
                 $('#precio-total-cesta').text(totalAcumulado.toFixed(2));
-                // Se habilita el botón incluso si un producto falla, para no bloquear al usuario
                 $('#btn-finalizar-compra').prop('disabled', false);
             }
         });
