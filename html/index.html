@@ -92,8 +92,19 @@
         <h5 class="offcanvas-title fw-bold" id="labelCesta">CESTA DE LA COMPRA</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body" id="contenedor-cesta">
-        <p class="text-muted">Tu cesta está vacía. ¡Agrega productos para verlos aquí!</p>
+    
+    <div class="bg-light p-3 border-bottom shadow-sm">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0 fw-bold text-uppercase">Total a pagar:</h6>
+            <h4 class="mb-0 fw-bold text-success"><span id="precio-total-cesta">0.00</span> €</h4>
+        </div>
+        <button id="btn-finalizar-compra" class="btn btn-success w-100 fw-bold" disabled>
+            <i class="bi bi-credit-card me-2"></i>Realizar Compra
+        </button>
+    </div>
+    
+    <div class="offcanvas-body p-0" id="contenedor-cesta">
+        <p class="text-muted p-3">Tu cesta está vacía. ¡Agrega productos para verlos aquí!</p>
     </div>
 </div>
 

@@ -1,22 +1,184 @@
-$(document).ready(function() {
-    // URL base de la API de Node.js
-    const API_URL = 'http://localhost:3000/api'; 
+// ==========================================
+// 1. VARIABLES GLOBALES Y FUNCIONES DE LA CESTA
+// ==========================================
+// Estas variables y funciones deben estar fuera del $(document).ready() 
+// para que el HTML pueda encontrarlas al hacer clic (onclick).
 
-    //Función para cargar productos y mostrarlos en la página
+const API_URL = 'http://localhost:3000/api'; 
+let productosEnCesta = []; 
+let totalCesta = 0;
+
+function añadirProducto(id, stockInicial) {
+    const stockElemento = document.getElementById(`stock-${id}`);
+    const elementoContador = document.getElementById('contador-carrito');
+    
+    // Sincronizar por si es el primer clic
+    totalCesta = parseInt(elementoContador.textContent) || 0;
+    
+    // Asegurarse de que el globo rojo es visible
+    if (elementoContador.style.display === 'none') {
+        elementoContador.style.display = 'inline-block';
+    }
+
+    if (stockElemento) {
+        let stockActual = parseInt(stockElemento.textContent);
+        
+        if (stockActual > 0) {
+            // 1. Actualizar contador total
+            totalCesta++;
+            elementoContador.textContent = totalCesta;
+            
+            // 2. Actualizar stock visual
+            stockActual--;
+            stockElemento.textContent = stockActual + " unidades";
+            
+            // 3. Añadir al array si es nuevo
+            if (!productosEnCesta.includes(id)) {
+                productosEnCesta.push(id);
+            }
+            
+            // 4. Actualizar cantidad específica de este producto
+            let cantidadAñadida = stockInicial - stockActual;
+            $(`#span-añadir-${id}`).text(cantidadAñadida);
+            
+            // 5. Deshabilitar si se agota
+            if (stockActual === 0) {
+                $(`#btn-añadir-${id}`).prop('disabled', true);
+            }
+            
+            // 6. Refrescar cesta
+            printCesta(productosEnCesta);
+        }
+    }
+}
+
+function quitarProducto(id, stockInicial) {
+    const spanAñadir = document.getElementById(`span-añadir-${id}`);
+    const stockElemento = document.getElementById(`stock-${id}`);
+    const elementoContador = document.getElementById('contador-carrito');
+    
+    totalCesta = parseInt(elementoContador.textContent) || 0;
+
+    if (spanAñadir && stockElemento) {
+        let cantidadEnCesta = parseInt(spanAñadir.textContent) || 0;
+        let stockActual = parseInt(stockElemento.textContent) || 0;
+
+        if (cantidadEnCesta > 0) {
+            // 1. Actualizar contador total
+            totalCesta--;
+            elementoContador.textContent = totalCesta;
+            
+            // Ocultar el globo si llega a cero
+            if (totalCesta === 0) {
+                elementoContador.style.display = 'none';
+            }
+            
+            // 2. Devolver stock visual
+            stockActual++;
+            stockElemento.textContent = stockActual + " unidades";
+            
+            // 3. Restar cantidad específica
+            cantidadEnCesta--;
+            
+            // 4. Lógica de borrado o actualización
+            if (cantidadEnCesta === 0) {
+                spanAñadir.innerHTML = '<i class="bi bi-cart me-2"></i>Añadir';
+                productosEnCesta = productosEnCesta.filter(productoId => productoId !== id);
+            } else {
+                spanAñadir.textContent = cantidadEnCesta;
+            }
+            
+            // 5. Reactivar botón de añadir
+            $(`#btn-añadir-${id}`).prop('disabled', false);
+            
+            // 6. Refrescar cesta
+            printCesta(productosEnCesta);
+        }
+    }
+}
+
+function printCesta(productos) {
+    $('#contenedor-cesta').empty();
+    
+    // Reinicio visual: total a cero y botón deshabilitado
+    $('#precio-total-cesta').text('0.00'); 
+    $('#btn-finalizar-compra').prop('disabled', true);
+
+    // Si la cesta está vacía, se detiene la ejecución aquí
+    if (productos.length === 0) {
+        $('#contenedor-cesta').html('<p class="text-muted p-3">Tu cesta está vacía. ¡Agrega productos para verlos aquí!</p>');
+        return;
+    }
+
+    let totalAcumulado = 0;
+    let peticionesCompletadas = 0;
+
+    for (const id of productos) {
+        $.get(`${API_URL}/productos/${id}`, function(p) {
+            
+            let cantidadEnCesta = parseInt($(`#span-añadir-${p.id}`).text()) || 0;
+            const subtotal = parseFloat(p.precio) * cantidadEnCesta;
+            
+            totalAcumulado += subtotal;
+            
+            const itemCesta = `
+                <div class="cesta-item p-3 d-flex justify-content-between align-items-center border-bottom">
+                    <div>
+                        <h6 class="mb-0 fw-bold">${p.nombre}</h6>
+                        <small class="text-muted">Precio unitario: ${p.precio}</small>
+                    </div>
+                    <div>
+                        <span class="badge bg-secondary rounded-pill">${cantidadEnCesta} un.</span>
+                    </div>
+                    <div class="text-primary fw-bold text-end">
+                        ${subtotal.toFixed(2)}
+                    </div>
+                </div>
+            `;
+            $('#contenedor-cesta').append(itemCesta);
+
+            peticionesCompletadas++;
+            // Cuando se carguen todos los productos de la cesta:
+            if (peticionesCompletadas === productos.length) {
+                // 1. Se actualiza el total
+                $('#precio-total-cesta').text(totalAcumulado.toFixed(2));
+                // 2. Se habilita el botón de compra
+                $('#btn-finalizar-compra').prop('disabled', false);
+            }
+
+        }).fail(function() {
+            console.log("Error al cargar producto con id " + id);
+            
+            peticionesCompletadas++;
+            if (peticionesCompletadas === productos.length) {
+                $('#precio-total-cesta').text(totalAcumulado.toFixed(2));
+                // Se habilita el botón incluso si un producto falla, para no bloquear al usuario
+                $('#btn-finalizar-compra').prop('disabled', false);
+            }
+        });
+    }
+}
+
+// ==========================================
+// 2. INICIALIZACIÓN Y EVENTOS DEL DOM
+// ==========================================
+// Todo lo que necesita que carga el DOM para funcionar debe estar dentro de este bloque.
+
+$(document).ready(function() {
+    
+    // --- FUNCIÓN: CARGAR PRODUCTOS ---
     function cargarProductos() {
         console.log("Conectando con la base de datos...");
-        // Llamada AJAX a tu servidor Node.js de la ruta GET de productos
         $.get(`${API_URL}/productos`, function(productos) {
             console.log("Datos recibidos:", productos);
 
-            // Se elimina el spinner y el mensaje de carga
             $('#contenedor-productos').empty();
 
-            // Si no hay productos se muestra un mensaje de productos no disponibles
             if (productos.length === 0) {
                 $('#contenedor-productos').append('<p class="text-center">No hay productos disponibles.</p>');
                 return;
             }
+            
             $.get(`${API_URL}/categorias`, function(categorias) {
                 categorias.forEach(c => {
                     const categoria = `
@@ -24,7 +186,6 @@ $(document).ready(function() {
                             <h3 class="fw-bold" style="cursor:pointer;" data-bs-toggle="collapse" data-bs-target="#collapse-${c.id}">
                                 ${c.nombre}
                             </h3>
-
                             <div class="collapse show" id="collapse-${c.id}">
                                 <div class="row g-3" id="lista-${c.id}">
                                 </div>
@@ -32,157 +193,126 @@ $(document).ready(function() {
                         </div>`;
                     $('#contenedor-productos').append(categoria);
                 });
-                // Se recorre el array de productos y se crea una tarjeta para cada uno
+                
                 productos.forEach(p => {
-                const imagenMostrada = p.imagen_url ? p.imagen_url : '../uploads/placeholder.png';
-                const tarjeta = `
-                    <div class="col-6 col-md-4 col-lg-3 tarjeta-producto" data-nombre="${p.nombre.toLowerCase()}">
-                        <div class="card h-100 shadow-sm border-0">
-                            <img src="${imagenMostrada}" class="imagen-card card-img-top" alt="${p.nombre}">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title h6">${p.nombre}</h5>
-                                <p class="card-text fw-bold text-primary">${p.precio} €</p>
-                                <p id="stock-${p.id}" class="card-text fw-bold text-primary">${p.stock} unidades</p>
-                                
-                                <div class="btn-group btn-group-sm mt-auto w-100" role="group" aria-label="Controles de carrito">
-    
-                                    <button type="button" class="btn btn-outline-primary px-1 btn-quitar" onclick="quitarProducto(${p.id})" title="Quitar unidad">
-                                        <i class="bi bi-dash-lg"></i>
-                                    </button>
-    
-                                    <span class="btn btn-outline-primary flex-grow-1 disabled" style="opacity: 1; pointer-events: none; border-left: none; border-right: none;">
-                                        <i class="bi bi-cart me-2"></i>Añadir
-                                    </span>
-    
-                                    <button type="button" class="btn btn-outline-primary px-1 btn-sumar" onclick="añadirProducto(${p.id})" title="Añadir unidad">
-                                        <i class="bi bi-plus-lg"></i>
-                                    </button>
-
+                    const imagenMostrada = p.imagen_url ? p.imagen_url : '../uploads/placeholder.png';
+                    const tarjeta = `
+                        <div class="col-6 col-md-4 col-lg-3 tarjeta-producto" data-nombre="${p.nombre.toLowerCase()}">
+                            <div class="card h-100 shadow-sm border-0">
+                                <img src="${imagenMostrada}" class="imagen-card card-img-top" alt="${p.nombre}">
+                                <div class="card-body d-flex flex-column">
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title fs-5 fw-bold mb-2">${p.nombre}</h5>
+                                        <p class="card-text fw-bold mb-1">Código: ${p.codigo_unico}</p>
+                                        <p class="card-text text-muted">Descripción: ${p.descripcion}</p>
+                                    </div>
+                                    <div class="mt-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="card-text fw-bold text-primary fs-6">Precio: ${p.precio}</span>
+                                            <span id="stock-${p.id}" class="badge bg-light text-dark border">${p.stock} unidades</span>
+                                        </div>
+                                        <div class="btn-group btn-group-sm w-100" role="group" aria-label="Controles de carrito">
+                                            <button id="btn-quitar-${p.id}" type="button" class="btn btn-outline-primary px-1 btn-quitar" onclick="quitarProducto(${p.id}, ${p.stock})" title="Quitar unidad">
+                                                <i class="bi bi-dash-lg"></i>
+                                            </button>
+                                            <span id="span-añadir-${p.id}" class="btn btn-outline-primary flex-grow-1 disabled" style="opacity: 1; pointer-events: none; border-left: none; border-right: none;">
+                                                <i class="bi bi-cart me-2"></i>Añadir
+                                            </span>
+                                            <button id="btn-añadir-${p.id}" type="button" class="btn btn-outline-primary px-1 btn-sumar" onclick="añadirProducto(${p.id}, ${p.stock})" title="Añadir unidad">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
-                // Agrega la tarjeta al contenedor de productos
-                $('#lista-' + p.categoria_id).append(tarjeta);
-            });
+                    `;
+                    $('#lista-' + p.categoria_id).append(tarjeta);
+                });
             }).fail(function() {
                 console.log("Error al cargar categorías");
             });
             
         }).fail(function() {
-            // Si el servidor está apagado o hay un error, se muestra un mensaje de error
             $('#contenedor-productos').html('<div class="alert alert-danger">Error al conectar con el servidor. Disculpe las molestias</div>');
         });
     }
 
-    // Ejecutar al cargar la página
-    cargarProductos();
-
-
-    //Función para la cesta y el stock de productos
-
-    let productosEnCesta = {};
-    const elementoContador = document.getElementById('contador-carrito');
-    let totalCesta = parseInt(elementoContador.textContent);
-
-    function añadirProducto(id) {
-        
-    }
-
-    function quitarProducto(id) {
-        
-    }
-
-    // Añadimos el "Visor" al final del HTML de la página
-    $('body').append(`
-        <div id="visor-centro">
-            <img src="" id="img-visor" alt="Vista ampliada">
-        </div>
-    `);
-
-    // Variable para guardar el reloj cuenta atrás
-    let temporizadorHover;
-
-    // Cuando el ratón ENTRA en la imagen de la tarjeta
-    $(document).on('mouseenter', '.imagen-card', function() {
-        const rutaImagen = $(this).attr('src'); // Copiamos la ruta de la imagen actual
-        
-        // Iniciamos el reloj (1000 milisegundos = 1 segundo) 
-        temporizadorHover = setTimeout(function() {
-            // Pasado 1 segundo, ponemos la imagen en el centro y lo mostramos
-            $('#img-visor').attr('src', rutaImagen);
-            $('#visor-centro').addClass('activo');
-        }, 1000); 
-    });
-
-    // Cuando el ratón SALE de la imagen de la tarjeta
-    $(document).on('mouseleave', '.imagen-card', function() {
-        // Cancelamos el reloj por si el usuario sacó el ratón antes del segundo
-        clearTimeout(temporizadorHover); 
-        
-        // Ocultamos el visor central instantáneamente
-        $('#visor-centro').removeClass('activo');
-    });
-
-    // Función encargada de filtrar los productos
-    function filtrarBuscador() {
-        // Obtener el texto escrito y pasarlo a minúsculas
-        const textoBuscado = $('#input-busqueda').val().toLowerCase();
-
-        // Recorrer cada tarjeta de la pantalla
-        $('.tarjeta-producto').each(function() {
-            // Leer el nombre del producto que guardamos en el HTML
-            const nombreProducto = $(this).attr('data-nombre');
-
-            // Comprobar si el nombre contiene el texto buscado
-            if (nombreProducto.includes(textoBuscado)) {
-                $(this).fadeIn(300); // Muestra la tarjeta si coincide
-            } else {
-                $(this).fadeOut(300); // Oculta la tarjeta si no coincide
-            }
-        });
-    }
-
-// Ejecutar el filtro en tiempo real mientras se escribe
-$('#input-busqueda').on('keyup', filtrarBuscador);
-
-    // Función para mostrar las categorías
+    // --- FUNCIÓN: CARGAR CATEGORÍAS ---
     function cargarCategorias() {
         console.log("Conectando con la base de datos...");
         $.get(`${API_URL}/categorias`, function(categorias) {
             console.log("Datos recibidos:", categorias);
-
+            
             $('.seccion-filtros').empty();
-
+            
             const opcionTodas = `
             <div class="form-check mb-2">
                 <input class="form-check-input" type="radio" name="categoria" id="cat-todas" value="0" checked>
                 <label class="form-check-label small" for="cat-todas">Todas las categorías</label>
             </div>
             <hr class="opacity-25">`;
-
+            
             $('.seccion-filtros').append(opcionTodas);
 
-            if(categorias.length ===0) {
+            if(categorias.length === 0) {
                 $('.seccion-filtros').append('<p class="text-center">No hay categorías disponibles.</p>');
                 return;
             } else {
                 categorias.forEach(c => {
-                    const filtro =  `<div class="form-check mb-2">
-                                        <input class="form-check-input" type="radio" name="categoria" id="cat-${c.nombre}" value="${c.id}">
-                                        <label class="form-check-label small" for="cat-${c.nombre}">${c.nombre}</label>
-                                    </div>`
+                    const filtro = `
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="categoria" id="cat-${c.nombre}" value="${c.id}">
+                            <label class="form-check-label small" for="cat-${c.nombre}">${c.nombre}</label>
+                        </div>`;
                     $('.seccion-filtros').append(filtro);
                 });
             }
-            
         }).fail(function() {
             $('.seccion-filtros').html('<div class="alert alert-danger">Error al conectar con el servidor. Disculpe las molestias</div>');
         });
-
     }
 
-    // Ejecutamos la función al cargar
+    // Ejecutar carga inicial
+    cargarProductos();
     cargarCategorias();
+
+    // --- LÓGICA: VISOR DE IMÁGENES ---
+    $('body').append(`
+        <div id="visor-centro">
+            <img src="" id="img-visor" alt="Vista ampliada">
+        </div>
+    `);
+
+    let temporizadorHover;
+
+    $(document).on('mouseenter', '.imagen-card', function() {
+        const rutaImagen = $(this).attr('src'); 
+        temporizadorHover = setTimeout(function() {
+            $('#img-visor').attr('src', rutaImagen);
+            $('#visor-centro').addClass('activo');
+        }, 1000); 
+    });
+
+    $(document).on('mouseleave', '.imagen-card', function() {
+        clearTimeout(temporizadorHover); 
+        $('#visor-centro').removeClass('activo');
+    });
+
+    // --- LÓGICA: BUSCADOR ---
+    function filtrarBuscador() {
+        const textoBuscado = $('#input-busqueda').val().toLowerCase();
+        
+        $('.tarjeta-producto').each(function() {
+            const nombreProducto = $(this).attr('data-nombre');
+            if (nombreProducto.includes(textoBuscado)) {
+                $(this).fadeIn(300); 
+            } else {
+                $(this).fadeOut(300); 
+            }
+        });
+    }
+
+    $('#input-busqueda').on('keyup', filtrarBuscador);
+
 });
