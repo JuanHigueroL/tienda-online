@@ -1,0 +1,54 @@
+====================================================================
+PRÁCTICA INTERMEDIA: FRAMEWORKS FRONTEND - TIENDA ONLINE
+====================================================================
+
+Este proyecto incluye mejoras sobre el enunciado original, implementando 
+una arquitectura completa con un backend real en Node.js y una base 
+de datos MySQL, además de la subida física de archivos de imagen.
+
+A continuación se detallan los pasos para ejecutar el proyecto correctamente:
+
+--------------------------------------------------------------------
+PASO 1: REQUISITOS PREVIOS
+--------------------------------------------------------------------
+1. Tener instalado Node.js en el equipo.
+2. Tener instalado y en ejecución un servidor MySQL (ej. XAMPP, WAMP o MySQL nativo).
+
+--------------------------------------------------------------------
+PASO 2: PREPARAR LA BASE DE DATOS
+--------------------------------------------------------------------
+1. Abrir phpMyAdmin (o el gestor de base de datos preferido).
+2. Importar o ejecutar el script proporcionado llamado "tienda-db.sql".
+3. Este script creará automáticamente la base de datos "tienda-db", las tablas necesarias (usuarios, categorias, productos, roles) y un dataset de prueba con productos e imágenes por defecto.
+
+--------------------------------------------------------------------
+PASO 3: INICIAR EL SERVIDOR BACKEND
+--------------------------------------------------------------------
+1. Abrir una terminal de comandos y navegar hasta la carpeta "backend".
+2. Ejecutar el comando: npm install
+   (Esto instalará las dependencias necesarias: express, mysql2, cors, multer).
+3. Ejecutar el comando: node index.js (si no funciona copiar y pegar la dirección en la que se encuentre el archivo + /index.js)
+4. La consola debe mostrar: 
+   "Servidor corriendo en http://localhost:3000"
+   "Conexión exitosa a MySQL".
+
+--------------------------------------------------------------------
+PASO 4: EJECUTAR EL FRONTEND
+--------------------------------------------------------------------
+1. Con el servidor backend corriendo, abrir el archivo "html/index.html" en cualquier navegador web.
+
+--------------------------------------------------------------------
+DATOS DE ACCESO PARA PRUEBAS
+--------------------------------------------------------------------
+- Contraseña para el panel de Administración: 123456
+- Al subir una imagen desde el panel de administración, esta se guardará físicamente en la carpeta "uploads" de la raíz del proyecto.
+
+--------------------------------------------------------------------
+MEJORAS ADICIONALES IMPLEMENTADAS (Para evaluación)
+--------------------------------------------------------------------
+- Arquitectura real Cliente-Servidor (Node.js + Express) en lugar de variables estáticas.
+- Persistencia de datos en base de datos relacional MySQL.
+- Subida de archivos físicos (imágenes) mediante FormData y Multer, gestionando rutas relativas.
+- Sistema de Modo Oscuro global implementado con Bootstrap y guardado en localStorage.
+- Visor de imágenes dinámico al pasar el ratón sobre los productos.
+- Bloqueo de UI y vaciado de variables seguro al procesar la pasarela de pago simulada.
