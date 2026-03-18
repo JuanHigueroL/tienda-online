@@ -44,6 +44,7 @@ function añadirProducto(id, stockInicial) {
             // 5. Deshabilitar si se agota
             if (stockActual === 0) {
                 $(`#btn-añadir-${id}`).prop('disabled', true);
+                $(`#img-${id}`).css('opacity', 0.5);
             }
             
             // 6. Refrescar cesta
@@ -64,6 +65,7 @@ function quitarProducto(id, stockInicial) {
         let stockActual = parseInt(stockElemento.textContent) || 0;
 
         if (cantidadEnCesta > 0) {
+            $(`#img-${id}`).css('opacity', 1);
             // 1. Actualizar contador total
             totalCesta--;
             elementoContador.textContent = totalCesta;
@@ -142,8 +144,12 @@ function printCesta(productos) {
                         <small class="text-muted">Precio un.: ${p.precio} €</small>
                     </div>
 
-                    <div class="text-end ms-2 d-flex flex-column align-items-end" style="min-width: 70px;">
-                        <span class="badge bg-secondary rounded-pill mb-2">${cantidadEnCesta} un.</span>
+                    <div class="text-end ms-2 d-flex flex-column align-items-end" style="min-width: 85px;">
+                        <button type="button" class="btn btn-sm btn-outline-danger p-1 mb-2 lh-1 w-100" onclick="quitarProducto(${p.id}, ${p.stock})" title="Eliminar 1 unidad de la cesta">
+                            <i class="bi bi-trash"></i> <span style="font-size: 0.7rem;">Quitar 1</span>
+                        </button>
+                        
+                        <span class="badge bg-secondary rounded-pill mb-1">${cantidadEnCesta} un.</span>
                         <div class="text-primary fw-bold">
                             ${subtotal.toFixed(2)} €
                         </div>
@@ -174,6 +180,66 @@ function printCesta(productos) {
     }
 }
 
+// --- LÓGICA: FINALIZAR COMPRA ---
+    $('#btn-finalizar-compra').on('click', function() {
+        
+        const mensajePago = `
+            <div class="d-flex flex-column justify-content-center align-items-center h-100 p-4 text-center" style="min-height: 300px;">
+                <i class="bi bi-credit-card-2-front text-primary mb-3" style="font-size: 4rem;"></i>
+                <h5 class="fw-bold">Redirigiendo...</h5>
+                <p class="text-muted">Aquí se realizaría la pasarela de pago.</p>
+            </div>
+        `;
+        
+        // Se incluye el mensaje en el panel lateral y se elimina la lista de productos
+        $('#contenedor-cesta').html(mensajePago);
+        
+        // Se deshabilita el propio botón de finalizar compra
+        $(this).prop('disabled', true);
+
+        // SE BLOQUEAN TODOS LOS BOTONES DE LA PÁGINA PRINCIPAL
+        $('.btn-sumar, .btn-quitar').prop('disabled', true);
+
+        // Se vacían los datos de la cesta para evitar problemas lógicos en segundo plano
+        productosEnCesta = [];
+        totalCesta = 0;
+        $('#contador-carrito').text('0').hide();
+    });
+
+    // --- LÓGICA: ABRIR MODAL DE ADMINISTRACIÓN ---
+    $('#btn-abrir-admin').on('click', function(e) {
+        e.preventDefault(); // Evita que la página salte hacia arriba por el href="#"
+        
+        // Se limpia el input y se ocultan errores previos cada vez que se abre
+        $('#input-password-admin').val('');
+        $('#error-password').hide();
+        
+        // Se inicializa y muestra el modal nativo de Bootstrap
+        const modalAdmin = new bootstrap.Modal(document.getElementById('modalAdmin'));
+        modalAdmin.show();
+    });
+
+    // --- LÓGICA: VALIDAR CONTRASEÑA ---
+    $('#btn-validar-admin').on('click', function() {
+        const password = $('#input-password-admin').val();
+        
+        if (password === '123456') {
+            // Contraseña correcta: Se redirige a la nueva página de gestión
+            window.location.href = 'admin.html';
+        } else {
+            // Contraseña incorrecta: Se muestra el error y se vacía el campo
+            $('#error-password').fadeIn();
+            $('#input-password-admin').val('').focus();
+        }
+    });
+
+    // Pequeña mejora de usabilidad: Permitir validar pulsando la tecla 'Enter'
+    $('#input-password-admin').on('keypress', function(e) {
+        if (e.which === 13) { // 13 es el código de la tecla Enter
+            $('#btn-validar-admin').click();
+        }
+    });
+
 // ==========================================
 // 2. INICIALIZACIÓN Y EVENTOS DEL DOM
 // ==========================================
@@ -194,6 +260,7 @@ $(document).ready(function() {
                 return;
             }
             
+            // Se crean las categorías primero y se le añade collapse a cada una
             $.get(`${API_URL}/categorias`, function(categorias) {
                 categorias.forEach(c => {
                     const categoria = `
@@ -209,12 +276,13 @@ $(document).ready(function() {
                     $('#contenedor-productos').append(categoria);
                 });
                 
+                // Luego se insertan los productos dentro de su categoría correspondiente
                 productos.forEach(p => {
                     const imagenMostrada = p.imagen_url ? p.imagen_url : '../uploads/placeholder.png';
                     const tarjeta = `
                         <div class="col-6 col-md-4 col-lg-3 tarjeta-producto" data-nombre="${p.nombre.toLowerCase()}">
                             <div class="card h-100 shadow-sm border-0">
-                                <img src="${imagenMostrada}" class="imagen-card card-img-top" alt="${p.nombre}">
+                                <img id="img-${p.id}" src="${imagenMostrada}" class="imagen-card card-img-top" alt="${p.nombre}">
                                 <div class="card-body d-flex flex-column">
                                     <div class="flex-grow-1">
                                         <h5 class="card-title fs-5 fw-bold mb-2">${p.nombre}</h5>
@@ -253,7 +321,7 @@ $(document).ready(function() {
         });
     }
 
-    // --- FUNCIÓN: CARGAR CATEGORÍAS ---
+    /* --- FUNCIÓN: CARGAR CATEGORÍAS --- PARA FILTROS Y DESCARTADO DE USO DE MOMENTO
     function cargarCategorias() {
         console.log("Conectando con la base de datos...");
         $.get(`${API_URL}/categorias`, function(categorias) {
@@ -286,11 +354,10 @@ $(document).ready(function() {
         }).fail(function() {
             $('.seccion-filtros').html('<div class="alert alert-danger">Error al conectar con el servidor. Disculpe las molestias</div>');
         });
-    }
+    }*/
 
     // Ejecutar carga inicial
     cargarProductos();
-    cargarCategorias();
 
     // --- LÓGICA: VISOR DE IMÁGENES ---
     $('body').append(`

@@ -1,6 +1,10 @@
 CREATE DATABASE IF NOT EXISTS `tienda-db`;
 USE `tienda-db`;
 
+DROP TABLE IF EXISTS `productos`;
+DROP TABLE IF EXISTS `categorias`;
+DROP TABLE IF EXISTS `usuarios`;
+
 CREATE TABLE categorias(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(20) NOT NULL UNIQUE
@@ -13,7 +17,7 @@ CREATE TABLE productos (
     descripcion TEXT,
     precio DECIMAL(10,2) NOT NULL,
     stock INT NOT NULL,
-    imagen_url VARCHAR(255),
+    imagen_url LONGTEXT,
     categoria_id INT,
     FOREIGN KEY (categoria_id) REFERENCES categorias(id));
     

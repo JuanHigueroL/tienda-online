@@ -34,7 +34,7 @@
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                         <li><a class="dropdown-item" href="#"><i class="bi bi-door-open me-2"></i>Iniciar Sesión</a></li>
                         <li><a class="dropdown-item" href="#"><i class="bi bi-person-plus me-2"></i>Registrarse</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="bi bi-person-gear me-2"></i>Admin</a></li>
+                        <li><a id="btn-abrir-admin" class="dropdown-item" href="#"><i class="bi bi-person-gear me-2"></i>Admin</a></li>
                     </ul>
                 </div>
 
@@ -105,6 +105,32 @@
     
     <div class="offcanvas-body p-0" id="contenedor-cesta">
         <p class="text-muted p-3">Tu cesta está vacía. ¡Agrega productos para verlos aquí!</p>
+    </div>
+</div>
+
+<div class="modal fade" id="modalAdmin" tabindex="-1" aria-labelledby="modalAdminLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold" id="modalAdminLabel">
+                    <i class="bi bi-shield-lock me-2"></i>Acceso de Administrador
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted text-center mb-4">Introduce el código de seguridad para gestionar los productos y categorías de la base de datos.</p>
+                <div class="mb-3">
+                    <input type="password" class="form-control form-control-lg text-center fw-bold text-tracking-widest" id="input-password-admin" placeholder="******" autocomplete="off">
+                    <div id="error-password" class="text-danger mt-2 text-center" style="display: none; font-size: 0.9rem;">
+                        <i class="bi bi-exclamation-triangle-fill me-1"></i> Contraseña incorrecta.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center border-top-0 pb-4">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary px-4 fw-bold" id="btn-validar-admin">Acceder</button>
+            </div>
+        </div>
     </div>
 </div>
 

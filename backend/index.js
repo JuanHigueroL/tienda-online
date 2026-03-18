@@ -15,6 +15,24 @@ app.use(cors());
 // permite que el servidor entienda los datos em formato JSON
 app.use(express.json());
 
+const multer = require('multer');
+const path = require('path');
+
+// Configuración de almacenamiento físico para las imágenes
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        // Esto apunta exactamente a la carpeta 'uploads' fuera del backend
+        cb(null, path.join(__dirname, '../uploads')); 
+    },
+    filename: function (req, file, cb) {
+        // Se renombra el archivo para evitar sobrescrituras (ej: 16789123-imagen.jpg)
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
 //Define la conexión a la base de datos MySQL
 const db = mysql.createConnection({
     host:'localhost',
@@ -177,17 +195,22 @@ app.get('/api/productos/categoria/:categoria_id', (req, res) => {
     });
 })
 
-//Crea la ruta de tipo POST para agregar un nuevo producto a la base de datos
-app.post('/api/productos', (req, res) => {
-    const { nombre, descripcion, precio, stock, imagen_url, categoria_id } = req.body;
-    // Validación básica
-    if (!categoria_id) {
-        return res.status(400).json({ mensaje: "La categoría es obligatoria" });
+// Se añade el middleware 'upload.single('imagen')' a la ruta
+app.post('/api/productos', upload.single('imagen'), (req, res) => {
+
+    // Ahora los datos de texto vienen en req.body y el archivo en req.file
+    const { codigo_unico, nombre, descripcion, precio, stock, categoria_id } = req.body;
+
+    if (!categoria_id || !codigo_unico) {
+        return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
     }
-    // Generamos el código único (usando tiempo + aleatorio para evitar colisiones)
-    const codigo_unico = `PROD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    // Si se subió un archivo, se guarda su ruta relativa; si no, queda vacío
+    const imagen_url = req.file ? `../uploads/${req.file.filename}` : '';
+
     const sqlInsert = "INSERT INTO productos (codigo_unico, nombre, descripcion, precio, stock, imagen_url, categoria_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
     const valores = [codigo_unico, nombre, descripcion, precio, stock, imagen_url, categoria_id];
+
     db.query(sqlInsert, valores, (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ 

@@ -1,32 +1,35 @@
 $(document).ready(function() {
+    
+    // Se identifican los elementos clave
+    const botonModoOscuro = $('#btn-modo-oscuro');
+    const htmlElement = $('html'); // Bootstrap 5.3 requiere aplicar el tema en la etiqueta <html>
+    const iconoModo = botonModoOscuro.find('i');
 
-    // Al cargar la página se intenta ver si hay un tema guardado
+    // 1. Cargar preferencia previa al iniciar la página
     const temaGuardado = localStorage.getItem('tema_tienda');
-
-    // Si existe un tema guardado, lo aplicamos de inmediato
-    if (temaGuardado) {
-        $('html').attr('data-bs-theme', temaGuardado);
-        $('#btn-modo-oscuro').html(temaGuardado === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>');
+    if (temaGuardado === 'dark') {
+        htmlElement.attr('data-bs-theme', 'dark');
+        iconoModo.removeClass('bi-moon').addClass('bi-sun');
+    } else {
+        htmlElement.attr('data-bs-theme', 'light');
+        iconoModo.removeClass('bi-sun').addClass('bi-moon');
     }
 
-    $('#btn-modo-oscuro').click(function(e) {
-        // Evitamos que el botón haga su acción por defecto
-        e.preventDefault();
+    // 2. Alternar el tema al hacer clic
+    botonModoOscuro.on('click', function() {
+        const temaActual = htmlElement.attr('data-bs-theme');
         
-        // Miramos qué tiene el HTML ahora mismo
-        const esOscuro = $('html').attr('data-bs-theme') === 'dark';
-
-        // Si esOscuro es true, el nuevo tema será 'light', si no, será 'dark'
-        const nuevoTema = esOscuro ? 'light' : 'dark';
-        const textoBoton = esOscuro ? '<i class="bi bi-moon"></i>' : '<i class="bi bi-sun"></i>';
-        
-        // Aplicamos el cambio visual
-        $('html').attr('data-bs-theme', nuevoTema);
-        $(this).html(textoBoton); 
-        
-        // Guardamos en la memoria
-        localStorage.setItem('tema_tienda', nuevoTema);
-
-        console.log("Nuevo tema guardado: " + nuevoTema);
+        if (temaActual === 'dark') {
+            // Cambiar a Modo Claro
+            htmlElement.attr('data-bs-theme', 'light');
+            localStorage.setItem('tema_tienda', 'light');
+            iconoModo.removeClass('bi-sun').addClass('bi-moon');
+        } else {
+            // Cambiar a Modo Oscuro
+            htmlElement.attr('data-bs-theme', 'dark');
+            localStorage.setItem('tema_tienda', 'dark');
+            iconoModo.removeClass('bi-moon').addClass('bi-sun');
+        }
     });
+
 });
