@@ -1,17 +1,16 @@
-
-    /* La imagen normal en la tarjeta */
+    /*CSS para el visor de imagen ampliada*/
     .imagen-card {
-        height: 250px; /* Define la altura exacta para TODAS las imágenes */
+        height: 250px; 
         object-fit: cover; /* Recorta el sobrante sin deformar la foto */
-        width: 100%; /* Asegura que ocupe todo el ancho de la tarjeta */
+        width: 100%;
     }
 
-    /* El fondo oscuro y centrado (Oculto por defecto) */
+    /* El fondo oscuro y centrado */
     #visor-centro {
         position: fixed;
         top: 0; left: 0; 
         width: 100vw; height: 100vh;
-        background-color: rgba(0, 0, 0, 0.85); /* Fondo muy oscuro */
+        background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro */
         z-index: 9999; /* Por encima de la barra de navegación y todo lo demás */
         
         /* Flexbox para centrar lo que haya dentro */
@@ -23,7 +22,7 @@
         transition: opacity 0.3s ease-in-out;
         
         /* Evita que el fondo interfiera con el ratón */
-        pointer-events: none; /* Solo se activará cuando tenga la clase .activo */
+        pointer-events: none;
     }
 
     /* Cuando el JS le añada la clase .activo, se mostrará */

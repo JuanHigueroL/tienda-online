@@ -12,7 +12,7 @@ INSERT INTO usuarios (nombre, correo, contrasena, rol_id) VALUES
 ('admin_tienda', 'admin@tienda.com', '123456', 1),
 ('comprador1', 'user@tienda.com', 'user123', 2);
 
--- 4. Productos (imagen_url se queda en NULL)
+-- 4. Productos
 INSERT INTO productos (codigo_unico, nombre, descripcion, precio, stock, imagen_url, categoria_id) VALUES 
 ('MON-001', 'Monitor Gamer 24"', 'Monitor Full HD 144Hz con panel IPS.', 199.99, 15, NULL, 1),
 ('TEC-002', 'Teclado Mecánico RGB', 'Switches Blue, distribución española, retroiluminado.', 59.50, 30, NULL, 2),

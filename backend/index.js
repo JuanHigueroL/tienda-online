@@ -20,10 +20,12 @@ const path = require('path');
 
 // Configuración de almacenamiento físico para las imágenes
 const storage = multer.diskStorage({
+    // Define la carpeta de destino para las imágenes guardadas
     destination: function (req, file, cb) {
         // Esto apunta exactamente a la carpeta 'uploads' fuera del backend
         cb(null, path.join(__dirname, '../uploads')); 
     },
+    // Define el nombre del archivo guardado
     filename: function (req, file, cb) {
         // Se renombra el archivo para evitar sobrescrituras (ej: 16789123-imagen.jpg)
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -31,6 +33,7 @@ const storage = multer.diskStorage({
     }
 });
 
+// Crea el middleware de Multer con la configuración de almacenamiento
 const upload = multer({ storage: storage });
 
 //Define la conexión a la base de datos MySQL
@@ -198,7 +201,6 @@ app.get('/api/productos/categoria/:categoria_id', (req, res) => {
 // Se añade el middleware 'upload.single('imagen')' a la ruta
 app.post('/api/productos', upload.single('imagen'), (req, res) => {
 
-    // Ahora los datos de texto vienen en req.body y el archivo en req.file
     const { codigo_unico, nombre, descripcion, precio, stock, categoria_id } = req.body;
 
     if (!categoria_id || !codigo_unico) {
@@ -229,7 +231,7 @@ app.put('/api/productos/:id', (req, res) => {
     const sqlUpdate = "UPDATE productos SET nombre = ?, descripcion = ?, precio = ?, stock = ?, imagen_url = ?, categoria_id = ? WHERE id = ?";
     const sqlGet = "SELECT * FROM productos WHERE id = ?";
 
-    // 1. Ejecutamos la actualización
+    // Ejecutamos la actualización
     db.query(sqlUpdate, [nombre, descripcion, precio, stock, imagen_url, categoria_id, id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         
@@ -238,7 +240,7 @@ app.put('/api/productos/:id', (req, res) => {
             return res.status(404).json({ mensaje: "Producto no encontrado" });
         }
 
-        // 2. Si se actualizó, buscamos el producto para devolverlo
+        // Si se actualizó, buscamos el producto para devolverlo
         db.query(sqlGet, [id], (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ mensaje: "Producto actualizado con éxito", producto: results[0] });

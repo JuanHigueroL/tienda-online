@@ -61,7 +61,7 @@ $(document).ready(function() {
         const codigo = $('#prod-codigo').val().trim();
         const inputArchivo = $('#prod-imagen')[0].files[0];
 
-        // Paso A: Comprobar que el código sea único
+        // Comprobar que el código sea único
         $.get(`${API_URL}/productos`, function(productosExistentes) {
             
             const codigoDuplicado = productosExistentes.some(p => p.codigo_unico === codigo);
@@ -71,7 +71,7 @@ $(document).ready(function() {
                 return; 
             }
 
-            // Paso B: Construir el paquete FormData (Archivos + Texto)
+            // Construir el paquete FormData (Archivos + Texto)
             let formData = new FormData();
             formData.append('nombre', $('#prod-nombre').val().trim());
             formData.append('codigo_unico', codigo);
@@ -90,8 +90,8 @@ $(document).ready(function() {
                 url: `${API_URL}/productos`,
                 type: 'POST',
                 data: formData,
-                processData: false, // Fundamental: evita que jQuery convierta los datos a string
-                contentType: false, // Fundamental: permite que el navegador defina el boundary multipart
+                processData: false, // Evita que jQuery convierta los datos a string
+                contentType: false, // Permite que el navegador establezca el Content-type evitando que jQuery lo transforme en texto plano
                 success: function() {
                     alert("¡Producto creado y guardado con éxito!");
                     $('#form-producto')[0].reset(); 
