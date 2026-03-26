@@ -2,7 +2,7 @@ $(document).ready(function() {
     
     // Se identifican los elementos clave
     const botonModoOscuro = $('#btn-modo-oscuro');
-    const htmlElement = $('html'); // Bootstrap 5.3 requiere aplicar el tema en la etiqueta <html>
+    const htmlElement = $('html'); 
     const iconoModo = botonModoOscuro.find('i');
 
     // 1. Cargar preferencia previa al iniciar la página
